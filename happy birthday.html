@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 42nd Birthday, Mom!</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0e68c;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+            animation: backgroundFade 10s infinite;
+            overflow: hidden;
+            position: relative;
+        }
+        @keyframes backgroundFade {
+            0% { background-color: #f0e68c; }
+            50% { background-color: #ffefd5; }
+            100% { background-color: #f0e68c; }
+        }
+        h1 {
+            font-size: 3rem;
+            color: #ff4500;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); color: #ff6347; }
+            100% { transform: scale(1); color: #ff4500; }
+        }
+        p {
+            font-size: 1.5rem;
+            margin: 20px 0;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            color: white;
+            background-color: #32cd32;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+        button:hover {
+            background-color: #228b22;
+        }
+        #message {
+            display: none;
+            margin-top: 20px;
+            color: #8b0000;
+            font-weight: bold;
+            font-style: italic;
+            text-align: center;
+        }
+        #heart {
+            font-size: 4rem;
+            color: #ff69b4;
+            animation: heartBeat 1s infinite;
+        }
+        @keyframes heartBeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+            100% { transform: scale(1.2); }
+        }
+        .balloons {
+            font-size: 3rem;
+            color: #ff69b4;
+            margin-top: 10px;
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+        }
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #ffa07a;
+            animation: fall 3s infinite linear;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100vh); }
+            100% { transform: translateY(100vh); }
+        }
+        @keyframes fallX {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(100vw); }
+        }
+        .confetti:nth-child(even) {
+            background-color: #ff4500;
+            animation: fall 3s infinite linear, fallX 5s infinite linear;
+        }
+        #age {
+            font-size: 2rem;
+            color: #ff4500;
+            margin-top: 20px;
+        }
+        #stars {
+            background: url('https://www.transparenttextures.com/patterns/stardust.png');
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        #countdown {
+            font-size: 1.5rem;
+            margin-top: 20px;
+            color: #ff4500;
+        }
+        #personalMessage {
+            color: #006400;
+            font-weight: bold;
+            font-style: italic;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .persistent-countdown {
+            position: fixed;
+            bottom: 0;
+            background-color: #fff;
+            color: #ff4500;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            border-top: 2px solid #ff4500;
+        }
+        .message-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            z-index: 10;
+        }
+        .message-box p {
+            font-style: italic;
+            color: #006400;
+            margin: 0;
+        }
+        #messageCounter {
+            font-size: 1rem;
+            color: #ff4500;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="stars"></div>
+    <h1>Happy 42nd Birthday, Mom!</h1>
+    <p>You are the heart and soul of our family. Keep shining bright, because the best is yet to come!</p>
+    <div id="heart">❤️</div>
+    <div class="balloons">🎈🎉🎈</div>
+    <button onclick="showNextMessage()">Click for a special message</button>
+    <div class="message-box" id="message">
+        <p id="messageContent"></p>
+        <div id="messageCounter"></div>
+    </div>
+    <div id="age">42 Years of Amazing You!</div>
+    <div class="persistent-countdown" id="persistentCountdown"></div>
+    <p id="personalMessage"></p>
+    <audio id="happyBirthdayMusic" autoplay>
+        <source src="happy-birthday.mp3" type="audio/mp3">
+    </audio>
+    <script>
+        // Array of messages
+        const messages = [
+            "Thx for caring and loving us for all these years and we ask God to give you many more years so you can continue to shine in our lives. From: Nduvho M",
+            "You have a heart of gold and a spirit that lights up every room. Happy Birthday!",
+            "Your love and kindness make every day brighter. Wishing you a day as special as you are!",
+            "May your birthday be filled with joy and your year ahead be as wonderful as you are.",
+            "Thank you for being an amazing mom. We cherish every moment with you. Happy Birthday!",
+            "Here’s to celebrating you and all the joy you bring to our lives. Enjoy your special day!"
+        ];
+
+        let currentMessageIndex = 0;
+
+        function showNextMessage() {
+            // Display next message
+            if (currentMessageIndex < messages.length) {
+                document.getElementById('messageContent').textContent = messages[currentMessageIndex];
+                document.getElementById('message').style.display = 'block';
+                document.getElementById('messageCounter').textContent = `Message ${currentMessageIndex + 1}/${messages.length}`;
+                currentMessageIndex++;
+            } else {
+                // Hide message box if all messages have been shown
+                document.getElementById('message').style.display = 'none';
+                currentMessageIndex = 0; // Reset to show messages again if needed
+            }
+        }
+
+        // Confetti Effect on Page Load
+        function createConfetti() {
+            for(let i = 0; i < 100; i++) {
+                let confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.top = Math.random() * 100 + 'vh';
+                confetti.style.backgroundColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+                confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+        window.onload = function() {
+            createConfetti();
+        };
+
+        // Countdown Timer
+        function updateCountdown() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const nextBirthday = new Date(year, 8, 3); // September 3rd
+
+            if (now > nextBirthday) {
+                nextBirthday.setFullYear(year + 1);
+            }
+
+            const distance = nextBirthday - now;
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            document.getElementById('persistentCountdown').innerHTML =
+                `Time until next September 3rd: ${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`;
+        }
+
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
+</body>
+</html>
